@@ -1,5 +1,5 @@
 import React, { useMemo } from 'react';
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
+import { XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, Area, AreaChart, ReferenceLine } from 'recharts';
 
 interface SentimentPoint {
   x: number; // Sentiment: -2 (very negative), -1 (negative), 0 (neutral), +1 (positive), +2 (very positive)
@@ -139,6 +139,10 @@ export const SentimentFlowChart: React.FC<SentimentFlowChartProps> = ({ data }) 
     return '';
   };
 
+  // Debug: Log aggregated data before rendering
+  console.log('🎨 Chart rendering with aggregated data:', aggregatedData.length, 'points');
+  console.log('🎨 Sample aggregated data for chart:', aggregatedData.slice(0, 3));
+
   return (
     <div className="w-full h-full bg-card rounded-lg border shadow-card overflow-hidden">
       <div className="p-4 border-b">
@@ -149,7 +153,7 @@ export const SentimentFlowChart: React.FC<SentimentFlowChartProps> = ({ data }) 
       </div>
       
       <div className="p-4">
-        <div className="h-[500px] w-full">
+        <div className="h-[500px] w-full" style={{ minHeight: '500px' }}>
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart data={aggregatedData} margin={{ top: 20, right: 30, left: 20, bottom: 20 }}>
               <defs>
@@ -193,24 +197,17 @@ export const SentimentFlowChart: React.FC<SentimentFlowChartProps> = ({ data }) 
               <ReferenceLine y={-1} stroke="#ef4444" strokeDasharray="5 5" opacity={0.5} />
               <ReferenceLine y={-2} stroke="#dc2626" strokeDasharray="5 5" opacity={0.4} />
               
-              {/* Main sentiment flow line */}
-              <Line
-                type="monotone"
-                dataKey="avgSentiment"
-                stroke="#3b82f6"
-                strokeWidth={3}
-                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
-                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
-                connectNulls={false}
-              />
-              
               {/* Area under the curve for better visual flow */}
               <Area
                 type="monotone"
                 dataKey="avgSentiment"
                 stroke="#3b82f6"
+                strokeWidth={3}
                 fill="url(#sentimentGradient)"
                 fillOpacity={0.3}
+                dot={{ fill: '#3b82f6', strokeWidth: 2, r: 4 }}
+                activeDot={{ r: 6, stroke: '#3b82f6', strokeWidth: 2 }}
+                connectNulls={false}
               />
             </AreaChart>
           </ResponsiveContainer>

@@ -18,7 +18,10 @@ export class ClaudeSentimentAnalysisService {
     const retryDelay = Math.pow(2, retryCount) * 1000 // 1s, 2s
 
     try {
-      console.log(`🤖 Claude analyzing sentiment via backend (attempt ${retryCount + 1}/${maxRetries + 1}) for: "${text.substring(0, 50)}..."`)
+      // Reduced logging - only log on first attempt
+      if (retryCount === 0) {
+        console.log(`🤖 Claude analyzing sentiment for: "${text.substring(0, 30)}..."`)
+      }
       
       const response = await fetch(this.BACKEND_URL, {
         method: 'POST',
@@ -37,7 +40,10 @@ export class ClaudeSentimentAnalysisService {
 
       const result = await response.json()
       
-      console.log(`✅ Claude analysis via backend: ${result.sentiment} (${result.sentimentValue}) confidence: ${result.confidence}`)
+      // Reduced logging - only log successful results occasionally
+      if (Math.random() < 0.1) { // Log only 10% of successful requests
+        console.log(`✅ Claude analysis: ${result.sentiment} (${result.sentimentValue}) confidence: ${result.confidence}`)
+      }
 
       return {
         sentiment: result.sentiment as 'very_negative' | 'negative' | 'neutral' | 'positive' | 'very_positive',
@@ -48,7 +54,10 @@ export class ClaudeSentimentAnalysisService {
       }
 
     } catch (error) {
-      console.error(`❌ Claude sentiment analysis error (attempt ${retryCount + 1}):`, error)
+      // Reduced logging - only log errors on first attempt
+      if (retryCount === 0) {
+        console.error(`❌ Claude sentiment analysis error:`, error.message)
+      }
       
       // Check if it's a network error
       const isNetworkError = error instanceof TypeError && 
@@ -65,7 +74,10 @@ export class ClaudeSentimentAnalysisService {
       // If network/timeout error, retry
       if ((isNetworkError || isTimeoutError) && retryCount < maxRetries) {
         const errorType = isTimeoutError ? 'timeout' : 'network'
-        console.log(`🔄 Retrying Claude after ${errorType} error in ${retryDelay}ms... (attempt ${retryCount + 1}/${maxRetries})`)
+        // Reduced logging - only log retries occasionally
+        if (retryCount === 0) {
+          console.log(`🔄 Retrying Claude after ${errorType} error...`)
+        }
         await new Promise(resolve => setTimeout(resolve, retryDelay))
         return this.analyzeSentiment(text, retryCount + 1)
       }
@@ -86,7 +98,7 @@ export class ClaudeSentimentAnalysisService {
    * Analyze sentiment of multiple texts in parallel with concurrency control
    */
   static async analyzeSentimentsBatch(texts: string[]): Promise<SentimentAnalysisResult[]> {
-    console.log(`🚀 Claude batch processing ${texts.length} texts with concurrency ${this.CONCURRENCY}`)
+    console.log(`🚀 Claude batch processing ${texts.length} texts`)
     
     const results: SentimentAnalysisResult[] = []
     
@@ -96,12 +108,18 @@ export class ClaudeSentimentAnalysisService {
       const chunkNumber = Math.floor(i / this.CONCURRENCY) + 1
       const totalChunks = Math.ceil(texts.length / this.CONCURRENCY)
       
-      console.log(`🚀 Claude processing chunk ${chunkNumber}/${totalChunks} (${chunk.length} texts in parallel)`)
+      // Reduced logging - only log every 5th chunk
+      if (chunkNumber % 5 === 1) {
+        console.log(`🚀 Claude processing chunk ${chunkNumber}/${totalChunks}`)
+      }
       
       // Process chunk in parallel
       const chunkPromises = chunk.map(async (text, index) => {
         const textIndex = i + index + 1
-        console.log(`📝 Claude processing text ${textIndex}/${texts.length}: "${text.substring(0, 50)}..."`)
+        // Reduced logging - only log every 10th text
+        if (textIndex % 10 === 1) {
+          console.log(`📝 Claude processing text ${textIndex}/${texts.length}`)
+        }
         return this.analyzeSentiment(text)
       })
       
@@ -110,7 +128,10 @@ export class ClaudeSentimentAnalysisService {
       
       // Add delay between chunks to avoid overwhelming the API
       if (i + this.CONCURRENCY < texts.length) {
-        console.log(`⏳ Waiting 1 second before next chunk...`)
+        // Reduced logging - only log wait occasionally
+      if (chunkNumber % 10 === 0) {
+        console.log(`⏳ Processing... ${Math.round((chunkNumber / totalChunks) * 100)}% complete`)
+      }
         await new Promise(resolve => setTimeout(resolve, 1000))
       }
     }

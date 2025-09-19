@@ -9,7 +9,7 @@ const app = express();
 app.use(cors({
   origin: process.env.NODE_ENV === 'production' 
     ? ['https://your-app.vercel.app'] // Replace with your actual Vercel domain
-    : ['http://localhost:3000', 'http://localhost:5173'],
+    : ['http://localhost:3000', 'http://localhost:5173', 'http://localhost:8080'],
   credentials: true
 }));
 app.use(express.json());

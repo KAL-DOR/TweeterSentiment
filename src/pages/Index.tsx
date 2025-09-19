@@ -404,6 +404,67 @@ const Index = () => {
               {/* Data Processing Controls */}
               <div className="p-4 bg-card rounded-lg border">
                 <h3 className="text-lg font-semibold mb-4">Data Processing Controls</h3>
+                
+                {/* Keyword Management */}
+                <div className="mb-6">
+                  <h4 className="text-md font-semibold mb-3 text-white-900 dark:text-white">Tweet Search Keywords</h4>
+                  
+                  {/* Add Keyword Form */}
+                  <div className="flex gap-2 mb-4">
+                    <input
+                      type="text"
+                      value={newKeyword}
+                      onChange={(e) => setNewKeyword(e.target.value)}
+                      placeholder="Enter keyword for tweet search..."
+                      className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 dark:placeholder-gray-400"
+                      onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
+                      disabled={isAddingKeyword}
+                    />
+                    <button
+                      onClick={addKeyword}
+                      disabled={isAddingKeyword || !newKeyword.trim()}
+                      className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2"
+                      title="Add keyword for tweet search"
+                    >
+                      <Plus className="h-4 w-4" />
+                      {isAddingKeyword ? 'Adding...' : 'Add'}
+                    </button>
+                  </div>
+
+                  {/* Keywords List */}
+                  <div className="space-y-2">
+                    <h5 className="text-sm font-medium text-white">
+                      Current Keywords ({keywords.length})
+                    </h5>
+                    {keywords.length === 0 ? (
+                      <p className="text-sm text-gray-500 dark:text-gray-400 italic">No keywords added yet</p>
+                    ) : (
+                      <div className="space-y-1">
+                        {keywords.map((keyword) => (
+                          <div
+                            key={keyword.id}
+                            className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600"
+                          >
+                            <span className="text-sm font-medium text-gray-900 dark:text-white">{keyword.keyword}</span>
+                            <div className="flex items-center gap-2">
+                              <span className="text-xs text-gray-500 dark:text-gray-400">
+                                {keyword.created_at ? new Date(keyword.created_at).toLocaleDateString() : ''}
+                              </span>
+                              <button
+                                onClick={() => deleteKeyword(keyword.id!)}
+                                className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
+                                title="Delete keyword"
+                              >
+                                <Trash2 className="h-4 w-4" />
+                              </button>
+                            </div>
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                  </div>
+                </div>
+
                 <div className="grid grid-cols-2 gap-3">
                   <button
                     onClick={handleFetchNewTweets}
@@ -480,65 +541,6 @@ const Index = () => {
                 )}
               </div>
 
-              {/* Keyword Management */}
-              <div className="p-4 bg-card rounded-lg border">
-                <h3 className="text-lg font-semibold mb-4 text-white-900 dark:text-white">Tweet Search Keywords</h3>
-                
-                {/* Add Keyword Form */}
-                <div className="flex gap-2 mb-4">
-                  <input
-                    type="text"
-                    value={newKeyword}
-                    onChange={(e) => setNewKeyword(e.target.value)}
-                    placeholder="Enter keyword for tweet search..."
-                    className="flex-1 px-3 py-2 bg-white dark:bg-gray-800 text-gray-900 dark:text-white border border-gray-300 dark:border-gray-600 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent placeholder-gray-500 dark:placeholder-gray-400"
-                    onKeyPress={(e) => e.key === 'Enter' && addKeyword()}
-                    disabled={isAddingKeyword}
-                  />
-                  <button
-                    onClick={addKeyword}
-                    disabled={isAddingKeyword || !newKeyword.trim()}
-                    className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 disabled:opacity-50 disabled:cursor-not-allowed font-medium flex items-center gap-2"
-                    title="Add keyword for tweet search"
-                  >
-                    <Plus className="h-4 w-4" />
-                    {isAddingKeyword ? 'Adding...' : 'Add'}
-                  </button>
-                </div>
-
-                {/* Keywords List */}
-                <div className="space-y-2">
-                  <h4 className="text-sm font-medium text-white">
-                    Current Keywords ({keywords.length})
-                  </h4>
-                  {keywords.length === 0 ? (
-                    <p className="text-sm text-gray-500 dark:text-gray-400 italic">No keywords added yet</p>
-                  ) : (
-                    <div className="space-y-1">
-                      {keywords.map((keyword) => (
-                        <div
-                          key={keyword.id}
-                          className="flex items-center justify-between p-2 bg-gray-50 dark:bg-gray-700 rounded-md border border-gray-200 dark:border-gray-600"
-                        >
-                          <span className="text-sm font-medium text-gray-900 dark:text-white">{keyword.keyword}</span>
-                          <div className="flex items-center gap-2">
-                            <span className="text-xs text-gray-500 dark:text-gray-400">
-                              {keyword.created_at ? new Date(keyword.created_at).toLocaleDateString() : ''}
-                            </span>
-                            <button
-                              onClick={() => deleteKeyword(keyword.id!)}
-                              className="text-red-500 hover:text-red-700 dark:text-red-400 dark:hover:text-red-300 text-sm p-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20"
-                              title="Delete keyword"
-                            >
-                              <Trash2 className="h-4 w-4" />
-                            </button>
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
             </aside>
 
             {/* Main 2D Graph Area */}
